@@ -8,8 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const getOrdersQuery = `SELECT id, title, amount FROM orders`
+
 func GetOrders(c *gin.Context) {
-	rows, err := database.DB.Query("SELECT id, title, amount FROM orders")
+	rows, err := database.DB.Query(getOrdersQuery)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error"})
 		return
@@ -29,6 +31,8 @@ func GetOrders(c *gin.Context) {
 	c.JSON(http.StatusOK, orders)
 }
 
+const createOrderQuery = `INSERT INTO orders (title, amount) VALUES ($1, $2) RETURNING id`
+
 func CreateOrder(c *gin.Context) {
 	var newOrder models.Order
 	if err := c.ShouldBindJSON(&newOrder); err != nil {
@@ -37,7 +41,7 @@ func CreateOrder(c *gin.Context) {
 	}
 
 	err := database.DB.QueryRow(
-		"INSERT INTO orders (title, amount) VALUES ($1, $2) RETURNING id",
+		createOrderQuery,
 		newOrder.Title, newOrder.Amount,
 	).Scan(&newOrder.ID)
 

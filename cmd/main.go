@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"log"
@@ -10,12 +10,12 @@ import (
 )
 
 func init() {
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load("config/.env"); err != nil {
 		log.Print("No .env file found")
 	}
 }
 
-func main() {
+func Run() {
 	err := database.Init()
 	if err != nil {
 		log.Fatalf("Failed to connect to DB: %v", err)
